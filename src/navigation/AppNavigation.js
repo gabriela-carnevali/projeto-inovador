@@ -1,6 +1,3 @@
-// Importa o React
-import React from 'react';
-
 // Importa o componente que cria a navegação em formato de pilha
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
