@@ -28,7 +28,7 @@ export default function Lendo() {
     }, [])
   );
 
-  async function carregarLivros() {
+  async function carregarLivros() { // Função para buscar os livros em leitura do banco de dados
     try {
       const resultado = await buscarLendo();
       setLivros(resultado);
@@ -39,7 +39,7 @@ export default function Lendo() {
 
   // Atualiza o progresso no estado local (feedback imediato)
   // e persiste no SQLite
-  async function handleAtualizarProgresso(id, novoProgresso) {
+  async function handleAtualizarProgresso(id, novoProgresso) { 
     setLivros((livrosAtuais) =>
       livrosAtuais.map((livro) =>
         livro.id === id ? { ...livro, progresso: novoProgresso } : livro
@@ -129,6 +129,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#f5f5f5',
   },
+
   capa: { width: 70, height: 100, borderRadius: 6, backgroundColor: '#ddd' },
   capaVazia: { justifyContent: 'center', alignItems: 'center' },
   capaVaziaTexto: { fontSize: 24 },
