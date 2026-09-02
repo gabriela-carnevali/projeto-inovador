@@ -10,8 +10,10 @@ import {
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { buscarLidos, excluirLivro } from '../database/livroRepository';
+import { useTheme } from '../theme/ThemeContext';
 
 export default function Lido() {
+  const { colors } = useTheme();
   const [livros, setLivros] = useState([]);
 
   // Recarrega a lista sempre que a tela ganha foco
@@ -60,7 +62,7 @@ export default function Lido() {
 
   function renderItem({ item }) {
     return (
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.surface }]}>
         {item.capa ? (
           <Image source={{ uri: item.capa }} style={styles.capa} />
         ) : (
@@ -70,8 +72,8 @@ export default function Lido() {
         )}
 
         <View style={styles.info}>
-          <Text style={styles.titulo}>{item.titulo}</Text>
-          <Text style={styles.autor}>{item.autor}</Text>
+          <Text style={[styles.titulo, { color: colors.text }]}>{item.titulo}</Text>
+          <Text style={[styles.autor, { color: colors.secondaryText }]}>{item.autor}</Text>
           <Text style={styles.concluido}>✅ Concluído</Text>
 
           <TouchableOpacity
@@ -86,9 +88,10 @@ export default function Lido() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={[styles.tituloPagina, { color: colors.text }]}>📚 Lido</Text>
       {livros.length === 0 ? (
-        <Text style={styles.vazio}>Você ainda não concluiu nenhum livro.</Text>
+        <Text style={[styles.vazio, { color: colors.mutedText }]}>Você ainda não concluiu nenhum livro.</Text>
       ) : (
         <FlatList
           data={livros}
@@ -111,6 +114,12 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 12,
     backgroundColor: '#f5f5f5',
+  },
+  tituloPagina: {
+    fontSize: 22,
+    fontWeight: "bold",
+    margin: 16,
+    color: "#2D3748",
   },
   capa: { width: 70, height: 100, borderRadius: 6, backgroundColor: '#ddd' },
   capaVazia: { justifyContent: 'center', alignItems: 'center' },

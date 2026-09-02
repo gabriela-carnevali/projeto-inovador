@@ -24,7 +24,7 @@ export default function LivroCard({ livro, onMudarStatus, onExcluir }) { // Rece
           </TouchableOpacity>
         )}
 
-        // Botão de transição de status para concluir a leitura
+        {/* Botão de transição de status para concluir a leitura */}
         {livro.status === 'lendo' && (
           <TouchableOpacity 
             style={[styles.botao, styles.botaoLido]} 

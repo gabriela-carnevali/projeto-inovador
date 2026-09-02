@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -6,17 +6,19 @@ import {
   Image,
   StyleSheet,
   TouchableOpacity,
-} from 'react-native';
-import Slider from '@react-native-community/slider';
+} from "react-native";
+import Slider from "@react-native-community/slider";
 
-import { useFocusEffect } from '@react-navigation/native'; //useFocusEffect utilizamos porque o usuário pode voltar da tela de cadastro e queremos que a lista seja atualizada automaticamente.
+import { useFocusEffect } from "@react-navigation/native"; //useFocusEffect utilizamos porque o usuário pode voltar da tela de cadastro e queremos que a lista seja atualizada automaticamente.
 
 import {
   buscarLendo,
   atualizarProgresso,
   concluirLeitura,
-} from '../database/livroRepository';
+} from "../database/livroRepository";
+import { useTheme } from "../theme/ThemeContext";
 export default function Lendo() {
+  const { colors } = useTheme();
   const [livros, setLivros] = useState([]);
 
   // Recarrega a lista sempre que a tela ganha foco
@@ -24,31 +26,44 @@ export default function Lendo() {
   useFocusEffect(
     useCallback(() => {
       carregarLivros();
-    }, [])
+    }, []),
   );
 
-  async function carregarLivros() { // Função para buscar os livros em leitura do banco de dados
+  async function carregarLivros() {
+    // Função para buscar os livros em leitura do banco de dados
     try {
       const resultado = await buscarLendo();
       setLivros(resultado);
     } catch (erro) {
-      console.log('Erro ao buscar livros em leitura:', erro);
+      console.log("Erro ao buscar livros em leitura:", erro);
     }
   }
 
   // Atualiza o progresso no estado local (feedback imediato)
   // e persiste no SQLite
-  async function handleAtualizarProgresso(id, novoProgresso) { 
+  async function handleAtualizarProgresso(id, novoProgresso) {
+    const progresso = Math.min(100, Math.max(0, Math.round(novoProgresso)));
+
     setLivros((livrosAtuais) =>
       livrosAtuais.map((livro) =>
-        livro.id === id ? { ...livro, progresso: novoProgresso } : livro
-      )
+        livro.id === id ? { ...livro, progresso } : livro,
+      ),
     );
 
     try {
-      await atualizarProgresso(id, novoProgresso);
+      if (progresso === 100) {
+        await concluirLeitura(id);
+      } else {
+        await atualizarProgresso(id, progresso);
+      }
+
+      if (progresso === 100) {
+        setLivros((livrosAtuais) =>
+          livrosAtuais.filter((livro) => livro.id !== id),
+        );
+      }
     } catch (erro) {
-      console.log('Erro ao salvar progresso:', erro);
+      console.log("Erro ao salvar progresso:", erro);
     }
   }
 
@@ -57,15 +72,17 @@ export default function Lendo() {
   async function handleConcluir(id) {
     try {
       await concluirLeitura(id);
-      setLivros((livrosAtuais) => livrosAtuais.filter((livro) => livro.id !== id));
+      setLivros((livrosAtuais) =>
+        livrosAtuais.filter((livro) => livro.id !== id),
+      );
     } catch (erro) {
-      console.log('Erro ao concluir leitura:', erro);
+      console.log("Erro ao concluir leitura:", erro);
     }
   }
 
   function renderItem({ item }) {
     return (
-      <View style={styles.card}>
+      <View style={[styles.card, { backgroundColor: colors.surface }]}>
         {item.capa ? (
           <Image source={{ uri: item.capa }} style={styles.capa} />
         ) : (
@@ -75,8 +92,8 @@ export default function Lendo() {
         )}
 
         <View style={styles.info}>
-          <Text style={styles.titulo}>{item.titulo}</Text>
-          <Text style={styles.autor}>{item.autor}</Text>
+          <Text style={[styles.titulo, { color: colors.text }]}>{item.titulo}</Text>
+          <Text style={[styles.autor, { color: colors.secondaryText }]}>{item.autor}</Text>
 
           <Slider
             style={styles.slider}
@@ -102,9 +119,12 @@ export default function Lendo() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text style={[styles.tituloPagina, { color: colors.text }]}>📚 Lendo</Text>
       {livros.length === 0 ? (
-        <Text style={styles.vazio}>Você não está lendo nenhum livro no momento.</Text>
+        <Text style={[styles.vazio, { color: colors.mutedText }]}>
+          Você não está lendo nenhum livro no momento.
+        </Text>
       ) : (
         <FlatList
           data={livros}
@@ -118,31 +138,36 @@ export default function Lendo() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: "#fff" },
   lista: { padding: 16 },
-  vazio: { textAlign: 'center', marginTop: 40, color: '#888', fontSize: 16 },
+  vazio: { textAlign: "center", marginTop: 40, color: "#888", fontSize: 16 },
   card: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 16,
     padding: 12,
     borderRadius: 12,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: "#f5f5f5",
   },
-
-  capa: { width: 70, height: 100, borderRadius: 6, backgroundColor: '#ddd' },
-  capaVazia: { justifyContent: 'center', alignItems: 'center' },
+  tituloPagina: {
+    fontSize: 22,
+    fontWeight: "bold",
+    margin: 16,
+    color: "#2D3748",
+  },
+  capa: { width: 70, height: 100, borderRadius: 6, backgroundColor: "#ddd" },
+  capaVazia: { justifyContent: "center", alignItems: "center" },
   capaVaziaTexto: { fontSize: 24 },
-  info: { flex: 1, marginLeft: 12, justifyContent: 'center' },
-  titulo: { fontSize: 16, fontWeight: 'bold' },
-  autor: { fontSize: 14, color: '#666', marginBottom: 4 },
-  slider: { width: '100%', height: 30 },
-  progressoTexto: { fontSize: 12, color: '#444', marginBottom: 6 },
+  info: { flex: 1, marginLeft: 12, justifyContent: "center" },
+  titulo: { fontSize: 16, fontWeight: "bold" },
+  autor: { fontSize: 14, color: "#666", marginBottom: 4 },
+  slider: { width: "100%", height: 30 },
+  progressoTexto: { fontSize: 12, color: "#444", marginBottom: 6 },
   botaoConcluir: {
-    alignSelf: 'flex-start',
-    backgroundColor: '#4CAF50',
+    alignSelf: "flex-start",
+    backgroundColor: "#4CAF50",
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,
   },
-  botaoConcluirTexto: { color: '#fff', fontWeight: 'bold', fontSize: 13 },
+  botaoConcluirTexto: { color: "#fff", fontWeight: "bold", fontSize: 13 },
 });
