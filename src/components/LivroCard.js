@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-export default function LivroCard({ livro, onMudarStatus, onExcluir }) {
+export default function LivroCard({ livro, onMudarStatus, onExcluir }) { // Recebe o livro e as funções de callback como props
   return (
     <View style={styles.card}>
       <View style={styles.infoContainer}>
@@ -24,6 +24,7 @@ export default function LivroCard({ livro, onMudarStatus, onExcluir }) {
           </TouchableOpacity>
         )}
 
+        // Botão de transição de status para concluir a leitura
         {livro.status === 'lendo' && (
           <TouchableOpacity 
             style={[styles.botao, styles.botaoLido]} 

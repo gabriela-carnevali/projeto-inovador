@@ -10,24 +10,14 @@ import CadastroLivro from '../screens/CadastroLivro';
 
 // Cria o navegador
 // Ele será responsável por controlar a passagem de uma tela para outra.
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator(); // Stack é uma pilha de telas, onde a tela atual fica no topo da pilha e as telas anteriores ficam abaixo dela. Quando o usuário navega para uma nova tela, ela é empilhada no topo. Quando ele volta, a tela do topo é removida, revelando a tela anterior.
 
 
 // Função principal da navegação
 export default function AppNavigation() {
 
     return (
-
-        // NavigationContainer é necessário para controlar a navegação.
-        // Ele será colocado no App.js.
         <Stack.Navigator>
-
-            {/* 
-                Tela "Querendo Ler"
-
-                initialRouteName define qual tela será aberta
-                primeiro quando o aplicativo iniciar.
-            */}
             <Stack.Screen
                 name="QuerendoLer"
                 component={QuerendoLer}
@@ -36,13 +26,6 @@ export default function AppNavigation() {
                 }}
             />
 
-
-            {/* 
-                Tela "Lendo"
-
-                Será acessada quando o usuário selecionar
-                um livro para começar a leitura.
-            */}
             <Stack.Screen
                 name="Lendo"
                 component={Lendo}
@@ -51,13 +34,6 @@ export default function AppNavigation() {
                 }}
             />
 
-
-            {/* 
-                Tela "Lido"
-
-                Será acessada depois que o usuário
-                concluir a leitura.
-            */}
             <Stack.Screen
                 name="Lido"
                 component={Lido}
@@ -65,13 +41,7 @@ export default function AppNavigation() {
                     title: 'Lido'
                 }}
             />
-
-
-            {/* 
-                Tela de cadastro
-
-                Permite adicionar um novo livro ao banco de dados.
-            */}
+            
             <Stack.Screen
                 name="CadastroLivro"
                 component={CadastroLivro}
