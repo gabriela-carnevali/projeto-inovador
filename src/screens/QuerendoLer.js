@@ -11,7 +11,7 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 
 import { buscarQuerendoLer, iniciarLeitura } from "../database/livroRepository";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../themeContext";
 
 export default function QuerendoLer({ navigation }) {
   const { colors } = useTheme();
@@ -97,7 +97,10 @@ export default function QuerendoLer({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
   tituloPagina: {
     fontSize: 22,
     fontWeight: "bold",

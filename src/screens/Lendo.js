@@ -16,7 +16,10 @@ import {
   atualizarProgresso,
   concluirLeitura,
 } from "../database/livroRepository";
+import { useTheme } from "../themeContext";
+
 export default function Lendo() {
+  const { colors } = useTheme();
   const [livros, setLivros] = useState([]);
 
   // Recarrega a lista sempre que a tela ganha foco
@@ -117,7 +120,7 @@ export default function Lendo() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={styles.tituloPagina}>📚 Lendo</Text>
       {livros.length === 0 ? (
         <Text style={styles.vazio}>

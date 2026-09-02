@@ -11,7 +11,7 @@ import QuerendoLerScreen from './src/screens/QuerendoLer';
 import LendoScreen from './src/screens/Lendo';
 import LidoScreen from './src/screens/Lido';
 import CadastroLivroScreen from './src/screens/CadastroLivro';
-import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
+import { ThemeProvider, useTheme } from './src/themeContext';
 
 const Tab = createBottomTabNavigator();
 

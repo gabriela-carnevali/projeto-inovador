@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { livroRepository } from '../database/livroRepository';
-import { useTheme } from '../theme/ThemeContext';
+import { useTheme } from '../themeContext';
 
 export default function CadastroLivro({ navigation }) {
   const { colors } = useTheme();

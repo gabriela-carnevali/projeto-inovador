@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { buscarLidos, excluirLivro } from "../database/livroRepository";
-import { useTheme } from "../theme/ThemeContext";
+import { useTheme } from "../themeContext";
 
 export default function Lido() {
   const { colors } = useTheme();
