@@ -16,9 +16,7 @@ import {
   atualizarProgresso,
   concluirLeitura,
 } from "../database/livroRepository";
-import { useTheme } from "../theme/ThemeContext";
 export default function Lendo() {
-  const { colors } = useTheme();
   const [livros, setLivros] = useState([]);
 
   // Recarrega a lista sempre que a tela ganha foco
@@ -82,7 +80,7 @@ export default function Lendo() {
 
   function renderItem({ item }) {
     return (
-      <View style={[styles.card, { backgroundColor: colors.surface }]}>
+      <View style={styles.card}>
         {item.capa ? (
           <Image source={{ uri: item.capa }} style={styles.capa} />
         ) : (
@@ -92,8 +90,8 @@ export default function Lendo() {
         )}
 
         <View style={styles.info}>
-          <Text style={[styles.titulo, { color: colors.text }]}>{item.titulo}</Text>
-          <Text style={[styles.autor, { color: colors.secondaryText }]}>{item.autor}</Text>
+          <Text style={styles.titulo}>{item.titulo}</Text>
+          <Text style={styles.autor}>{item.autor}</Text>
 
           <Slider
             style={styles.slider}
@@ -119,10 +117,10 @@ export default function Lendo() {
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.tituloPagina, { color: colors.text }]}>📚 Lendo</Text>
+    <View style={styles.container}>
+      <Text style={styles.tituloPagina}>📚 Lendo</Text>
       {livros.length === 0 ? (
-        <Text style={[styles.vazio, { color: colors.mutedText }]}>
+        <Text style={styles.vazio}>
           Você não está lendo nenhum livro no momento.
         </Text>
       ) : (
@@ -138,9 +136,19 @@ export default function Lendo() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
-  lista: { padding: 16 },
-  vazio: { textAlign: "center", marginTop: 40, color: "#888", fontSize: 16 },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  lista: {
+    padding: 16,
+  },
+  vazio: {
+    textAlign: "center",
+    marginTop: 40,
+    color: "#888",
+    fontSize: 16,
+  },
   card: {
     flexDirection: "row",
     marginBottom: 16,
@@ -154,14 +162,42 @@ const styles = StyleSheet.create({
     margin: 16,
     color: "#2D3748",
   },
-  capa: { width: 70, height: 100, borderRadius: 6, backgroundColor: "#ddd" },
-  capaVazia: { justifyContent: "center", alignItems: "center" },
-  capaVaziaTexto: { fontSize: 24 },
-  info: { flex: 1, marginLeft: 12, justifyContent: "center" },
-  titulo: { fontSize: 16, fontWeight: "bold" },
-  autor: { fontSize: 14, color: "#666", marginBottom: 4 },
-  slider: { width: "100%", height: 30 },
-  progressoTexto: { fontSize: 12, color: "#444", marginBottom: 6 },
+  capa: {
+    width: 70,
+    height: 100,
+    borderRadius: 6,
+    backgroundColor: "#ddd",
+  },
+  capaVazia: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  capaVaziaTexto: {
+    fontSize: 24,
+  },
+  info: {
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: "center",
+  },
+  titulo: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  autor: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 4,
+  },
+  slider: {
+    width: "100%",
+    height: 30,
+  },
+  progressoTexto: {
+    fontSize: 12,
+    color: "#444",
+    marginBottom: 6,
+  },
   botaoConcluir: {
     alignSelf: "flex-start",
     backgroundColor: "#4CAF50",
