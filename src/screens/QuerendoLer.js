@@ -52,10 +52,14 @@ export default function QuerendoLer({ navigation }) {
         {/* Área com as informações do livro */}
         <View style={styles.informacoes}>
           {/* Título */}
-          <Text style={[styles.titulo, { color: colors.text }]}>{item.titulo}</Text>
+          <Text style={[styles.titulo, { color: colors.text }]}>
+            {item.titulo}
+          </Text>
 
           {/* Autor */}
-          <Text style={[styles.autor, { color: colors.secondaryText }]}>{item.autor}</Text>
+          <Text style={[styles.autor, { color: colors.secondaryText }]}>
+            {item.autor}
+          </Text>
           <TouchableOpacity
             style={styles.botao}
             onPress={() => selecionarLivro(item.id)}
@@ -69,7 +73,9 @@ export default function QuerendoLer({ navigation }) {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.tituloPagina, { color: colors.text }]}>📚 Querendo Ler</Text>
+      <Text style={[styles.tituloPagina, { color: colors.text }]}>
+        📚 Querendo Ler
+      </Text>
       <FlatList
         data={livros}
         renderItem={renderLivro}
@@ -131,11 +137,28 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "#DDD",
   },
-  capaVazia: { justifyContent: "center", alignItems: "center" },
-  capaVaziaTexto: { fontSize: 24 },
-  informacoes: { flex: 1, marginLeft: 12, justifyContent: "center" },
-  titulo: { fontSize: 16, fontWeight: "bold", color: "#2D3748" },
-  autor: { fontSize: 14, color: "#666", marginBottom: 8 },
+  capaVazia: {
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  capaVaziaTexto: {
+    fontSize: 24,
+  },
+  informacoes: {
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: "center",
+  },
+  titulo: {
+    fontSize: 16,
+    fontWeight: "bold",
+    color: "#2D3748",
+  },
+  autor: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 8,
+  },
   botao: {
     alignSelf: "flex-start",
     backgroundColor: "#3182CE",
@@ -143,5 +166,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
   },
-  textoBotao: { color: "#fff", fontWeight: "bold", fontSize: 13 },
+  textoBotao: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 13,
+  },
 });
