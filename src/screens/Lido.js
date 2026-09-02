@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
-import { buscarLidos, excluirLivro } from './livroRepository';
+import { buscarLidos, excluirLivro } from '../database/livroRepository';
 
 export default function Lido() {
   const [livros, setLivros] = useState([]);

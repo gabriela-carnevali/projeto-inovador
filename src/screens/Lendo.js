@@ -15,8 +15,7 @@ import {
   buscarLendo,
   atualizarProgresso,
   concluirLeitura,
-} from './livroRepository';
-
+} from '../database/livroRepository';
 export default function Lendo() {
   const [livros, setLivros] = useState([]);
 
