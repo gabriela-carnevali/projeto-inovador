@@ -27,7 +27,7 @@ Com o app, você consegue categorizar seus livros nas etapas (**Querendo Ler**, 
 Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
 
 
-🧑‍💻 Autores e ContatoConstruído por [Elisa Dias Sérgio e Gabriela Carnevali Gonçalves Lima] — Entre em contato!
+🧑‍💻 Autores e Contato Construído por [Elisa Dias Sérgio e Gabriela Carnevali Gonçalves Lima] — Entre em contato!
 
 E-mail: elisa.sergio@aluno.senai.br
  gabriela.c.lima10@aluno.senai.br
