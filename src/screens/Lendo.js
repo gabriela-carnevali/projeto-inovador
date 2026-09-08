@@ -1,4 +1,7 @@
+// Importa os hooks do React para gerenciar estado e otimizar callbacks
 import { useState, useCallback } from "react";
+
+// Importa os componentes visuais essenciais do React Native
 import {
   View,
   Text,
@@ -7,44 +10,52 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+
+// Importa o componente de controle deslizante (Slider) para ajustar o progresso da leitura
 import Slider from "@react-native-community/slider";
 
-import { useFocusEffect } from "@react-navigation/native"; //useFocusEffect utilizamos porque o usuário pode voltar da tela de cadastro e queremos que a lista seja atualizada automaticamente.
+// Importa o hook 'useFocusEffect' do React Navigation:
+// Ele executa uma ação toda vez que esta tela ganha o foco (aparece para o usuário na tela).
+// É essencial aqui para atualizar a lista ao voltar da tela de cadastro de livro.
+import { useFocusEffect } from "@react-navigation/native";
 
+// Importa as funções do banco de dados relativas à leitura em andamento
 import {
   buscarLendo,
   atualizarProgresso,
   concluirLeitura,
 } from "../database/livroRepository";
+
+// Importa o contexto para obter as cores do tema (claro/escuro)
 import { useTheme } from "../themeContext";
 
 export default function Lendo() {
-  const { colors } = useTheme();
-  const [livros, setLivros] = useState([]);
+  const { colors } = useTheme(); // Pega as cores dinâmicas do tema
+  const [livros, setLivros] = useState([]); // Estado que armazena a lista de livros sendo lidos
 
-  // Recarrega a lista sempre que a tela ganha foco
-  // (ex: depois de voltar da tela de Cadastrar Livro)
+  // Executa o carregamento dos livros sempre que a tela entra em foco no app
   useFocusEffect(
     useCallback(() => {
       carregarLivros();
     }, []),
   );
 
+  // Busca no banco de dados SQLite apenas os livros com status 'lendo'
   async function carregarLivros() {
-    // Função para buscar os livros em leitura do banco de dados
     try {
       const resultado = await buscarLendo();
-      setLivros(resultado);
+      setLivros(resultado); // Salva o resultado no estado para renderizar
     } catch (erro) {
       console.log("Erro ao buscar livros em leitura:", erro);
     }
   }
 
-  // Atualiza o progresso no estado local (feedback imediato)
-  // e persiste no SQLite
+  // Atualiza o progresso (de 0 a 100%) quando o usuário arrasta o Slider
   async function handleAtualizarProgresso(id, novoProgresso) {
+    // Garante que o valor fique estritamente entre 0 e 100 e seja um número inteiro
     const progresso = Math.min(100, Math.max(0, Math.round(novoProgresso)));
 
+    // 1. Atualização Otimista: Atualiza a interface IMEDIATAMENTE antes de responder ao banco
     setLivros((livrosAtuais) =>
       livrosAtuais.map((livro) =>
         livro.id === id ? { ...livro, progresso } : livro,
@@ -52,12 +63,14 @@ export default function Lendo() {
     );
 
     try {
+      // 2. Se o Slider chegou em 100%, marca como concluído no banco; senão apenas atualiza a porcentagem
       if (progresso === 100) {
         await concluirLeitura(id);
       } else {
         await atualizarProgresso(id, progresso);
       }
 
+      // 3. Se atingiu 100%, remove o livro da tela "Lendo" (pois agora ele vai para "Lido")
       if (progresso === 100) {
         setLivros((livrosAtuais) =>
           livrosAtuais.filter((livro) => livro.id !== id),
@@ -68,11 +81,11 @@ export default function Lendo() {
     }
   }
 
-  // Marca o livro como concluído (status = "lido", progresso = 100)
-  // e remove ele da lista local, já que não pertence mais a "Lendo"
+  // Ação manual do botão 'Concluir': marca como concluído e remove do estado atual
   async function handleConcluir(id) {
     try {
       await concluirLeitura(id);
+      // Filtra o estado local mantendo apenas os livros que NÃO têm esse ID
       setLivros((livrosAtuais) =>
         livrosAtuais.filter((livro) => livro.id !== id),
       );
@@ -81,9 +94,11 @@ export default function Lendo() {
     }
   }
 
+  // Função responsável por renderizar cada item (livro) da FlatList
   function renderItem({ item }) {
     return (
       <View style={styles.card}>
+        {/* Renderização condicional da Capa: se houver foto exibe a imagem; caso contrário, exibe um ícone padrão */}
         {item.capa ? (
           <Image source={{ uri: item.capa }} style={styles.capa} />
         ) : (
@@ -92,22 +107,25 @@ export default function Lendo() {
           </View>
         )}
 
+        {/* Informações de texto e controles de leitura */}
         <View style={styles.info}>
           <Text style={styles.titulo}>{item.titulo}</Text>
           <Text style={styles.autor}>{item.autor}</Text>
 
+          {/* Controle Deslizante de Progresso */}
           <Slider
             style={styles.slider}
-            minimumValue={0}
-            maximumValue={100}
-            step={1}
-            value={item.progresso}
+            minimumValue={0} // Valor mínimo
+            maximumValue={100} // Valor máximo
+            step={1} // Anda de 1 em 1 porcento
+            value={item.progresso} // Posição atual baseada no valor do banco
             onSlidingComplete={(valor) =>
-              handleAtualizarProgresso(item.id, valor)
+              handleAtualizarProgresso(item.id, valor) // Salva no banco só quando o usuário solta o slider
             }
           />
           <Text style={styles.progressoTexto}>{item.progresso}%</Text>
 
+          {/* Botão de atalho para finalizar o livro */}
           <TouchableOpacity
             style={styles.botaoConcluir}
             onPress={() => handleConcluir(item.id)}
@@ -122,11 +140,14 @@ export default function Lendo() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={styles.tituloPagina}>📚 Lendo</Text>
+      
+      {/* Exibe mensagem de lista vazia caso o usuário não tenha nenhum livro em andamento */}
       {livros.length === 0 ? (
         <Text style={styles.vazio}>
           Você não está lendo nenhum livro no momento.
         </Text>
       ) : (
+        /* Lista de alta performance para renderizar os cards dos livros */
         <FlatList
           data={livros}
           keyExtractor={(item) => String(item.id)}
@@ -138,6 +159,7 @@ export default function Lendo() {
   );
 }
 
+// Folha de estilos dos componentes
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -153,7 +175,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   card: {
-    flexDirection: "row",
+    flexDirection: "row", // Posiciona capa à esquerda e dados à direita
     marginBottom: 16,
     padding: 12,
     borderRadius: 12,
@@ -208,5 +230,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     borderRadius: 8,
   },
-  botaoConcluirTexto: { color: "#fff", fontWeight: "bold", fontSize: 13 },
+  botaoConcluirTexto: { 
+    color: "#fff", 
+    fontWeight: "bold", 
+    fontSize: 13 
+  },
 });
