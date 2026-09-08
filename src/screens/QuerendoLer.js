@@ -1,5 +1,9 @@
-// O useState será usado para guardar os livros na tela.
+// Importa hooks do React:
+// - useState: cria o estado para armazenar a lista de livros
+// - useCallback: otimiza funções para não serem recriadas desnecessariamente na memória
 import { useCallback, useState } from "react";
+
+// Importa os componentes visuais do React Native
 import {
   View,
   Text,
@@ -8,39 +12,47 @@ import {
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
+
+// Importa o hook do React Navigation para detectar quando a tela entra em foco (fica visível)
 import { useFocusEffect } from "@react-navigation/native";
 
+// Importa as funções do banco de dados SQLite
 import { buscarQuerendoLer, iniciarLeitura } from "../database/livroRepository";
+
+// Importa o hook para acessar as cores do tema (claro ou escuro)
 import { useTheme } from "../themeContext";
 
 export default function QuerendoLer({ navigation }) {
-  const { colors } = useTheme();
-  const [livros, setLivros] = useState([]);
-  const carregarLivros = () => {
-    //busca livros no banco de dados e atualiza a tela
+  const { colors } = useTheme(); // Extrai as cores estilizadas de acordo com o tema configurado
+  const [livros, setLivros] = useState([]); // Estado para guardar o array de livros desejados
 
+  // Busca os livros gravados no SQLite com o status "querendo" e guarda no estado
+  const carregarLivros = () => {
     const livrosDoBanco = buscarQuerendoLer();
     setLivros(livrosDoBanco);
   };
 
+  // Executa 'carregarLivros' automaticamente sempre que o usuário abre ou volta para esta tela
   useFocusEffect(
     useCallback(() => {
       carregarLivros();
     }, []),
   );
 
+  // Ação ao clicar no botão 'Selecionar' para dar início à leitura do livro
   const selecionarLivro = (id) => {
-    iniciarLeitura(id);
+    iniciarLeitura(id); // Muda o status do livro no banco de dados para 'lendo'
 
-    carregarLivros(); //o livro selecionado não aparece mais na tela "Querendo Ler"
+    carregarLivros(); // Recarrega a lista para remover o livro que agora está sendo lido
 
-    navigation.navigate("Lendo"); //muda para tela Lendo
+    navigation.navigate("Lendo"); // Redireciona a navegação direto para a tela "Lendo"
   };
 
+  // Função responsável por montar o cartão visual de cada livro na lista
   const renderLivro = ({ item }) => {
     return (
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        {/* Capa do livro */}
+        {/* Capa do livro: exibe a foto caso exista, senão mostra um quadro cinza com emoji */}
         {item.capa ? (
           <Image source={{ uri: item.capa }} style={styles.capa} />
         ) : (
@@ -49,7 +61,7 @@ export default function QuerendoLer({ navigation }) {
           </View>
         )}
 
-        {/* Área com as informações do livro */}
+        {/* Informações de texto e botão do livro */}
         <View style={styles.informacoes}>
           {/* Título */}
           <Text style={[styles.titulo, { color: colors.text }]}>
@@ -60,6 +72,8 @@ export default function QuerendoLer({ navigation }) {
           <Text style={[styles.autor, { color: colors.secondaryText }]}>
             {item.autor}
           </Text>
+
+          {/* Botão de ação para mover para a lista de leitura atual */}
           <TouchableOpacity
             style={styles.botao}
             onPress={() => selecionarLivro(item.id)}
@@ -73,19 +87,25 @@ export default function QuerendoLer({ navigation }) {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Título principal no topo da tela */}
       <Text style={[styles.tituloPagina, { color: colors.text }]}>
         📚 Querendo Ler
       </Text>
+
+      {/* Lista dinamicamente renderizada dos livros */}
       <FlatList
-        data={livros}
-        renderItem={renderLivro}
-        keyExtractor={(item) => item.id.toString()}
+        data={livros} // Fonte dos dados
+        renderItem={renderLivro} // Função que cria cada item
+        keyExtractor={(item) => item.id.toString()} // Chave única para o React Native identificar cada linha
         ListEmptyComponent={
+          // O que aparece quando não existe nenhum livro cadastrado na lista
           <Text style={[styles.listaVazia, { color: colors.mutedText }]}>
             Nenhum livro na lista de desejos.
           </Text>
         }
       />
+
+      {/* Botão fixo na parte inferior para navegar até a tela de cadastro */}
       <TouchableOpacity
         style={styles.botaoNovoLivro}
         onPress={() => navigation.navigate("Cadastrar")}
@@ -96,6 +116,7 @@ export default function QuerendoLer({ navigation }) {
   );
 }
 
+// Estilização visual dos componentes da tela
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -127,7 +148,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   card: {
-    flexDirection: "row",
+    flexDirection: "row", // Lado a lado (imagem na esquerda, dados na direita)
     marginHorizontal: 16,
     marginBottom: 16,
     padding: 12,
