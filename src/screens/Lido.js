@@ -1,4 +1,7 @@
+// Importa hooks do React para controlar dados (useState) e otimizar funções (useCallback)
 import { useState, useCallback } from "react";
+
+// Importa os componentes de interface do React Native
 import {
   View,
   Text,
@@ -8,52 +11,59 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
+
+// Importa 'useFocusEffect' do React Navigation para recarregar a tela sempre que ela for aberta
 import { useFocusEffect } from "@react-navigation/native";
+
+// Importa as funções para buscar os livros concluídos e para deletar um livro do banco
 import { buscarLidos, excluirLivro } from "../database/livroRepository";
+
+// Importa o hook para aplicar as cores do tema (claro/escuro)
 import { useTheme } from "../themeContext";
 
 export default function Lido() {
-  const { colors } = useTheme();
-  const [livros, setLivros] = useState([]);
+  const { colors } = useTheme(); // Recebe os estilos de cor atuais do aplicativo
+  const [livros, setLivros] = useState([]); // Guarda a lista de livros concluídos
 
-  // Recarrega a lista sempre que a tela ganha foco
-  // (ex: depois de concluir um livro na tela "Lendo")
+  // Executa a busca dos livros toda vez que a tela ganha foco
   useFocusEffect(
     useCallback(() => {
       carregarLivros();
     }, []),
   );
 
+  // Busca no SQLite apenas os livros marcados com status 'lido'
   async function carregarLivros() {
     try {
       const resultado = await buscarLidos();
-      setLivros(resultado);
+      setLivros(resultado); // Atualiza a lista na tela
     } catch (erro) {
       console.log("Erro ao buscar livros lidos:", erro);
     }
   }
 
-  // Confirma antes de excluir, pois é uma ação irreversível
+  // Abre uma caixa de confirmação nativa (Alert) para evitar exclusões acidentais
   function confirmarExclusao(id, titulo) {
     Alert.alert(
-      "Excluir livro",
-      `Tem certeza que deseja excluir "${titulo}" da sua biblioteca?`,
+      "Excluir livro", // Título da mensagem
+      `Tem certeza que deseja excluir "${titulo}" da sua biblioteca?`, // Texto com o nome do livro
       [
-        { text: "Cancelar", style: "cancel" },
+        { text: "Cancelar", style: "cancel" }, // Botão para desistir da ação
         {
           text: "Excluir",
-          style: "destructive",
-          onPress: () => handleExcluir(id),
+          style: "destructive", // Deixa o texto vermelho no iOS
+          onPress: () => handleExcluir(id), // Chama a exclusão real ao confirmar
         },
       ],
     );
   }
 
+  // Remove o livro do banco e atualiza a interface
   async function handleExcluir(id) {
     try {
-      await excluirLivro(id);
-      // Remove da lista local só depois que o banco confirmar a exclusão,
-      // diferente do progresso, que atualiza a tela antes de salvar
+      await excluirLivro(id); // Exclui o livro do banco de dados SQLite
+      
+      // Filtra e atualiza a lista local removendo o livro com esse ID
       setLivros((livrosAtuais) =>
         livrosAtuais.filter((livro) => livro.id !== id),
       );
@@ -62,9 +72,11 @@ export default function Lido() {
     }
   }
 
+  // Monta o layout de cada cartão de livro concluído na lista
   function renderItem({ item }) {
     return (
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        {/* Mostra a imagem da capa se ela existir, ou o ícone de livro como padrão */}
         {item.capa ? (
           <Image source={{ uri: item.capa }} style={styles.capa} />
         ) : (
@@ -73,6 +85,7 @@ export default function Lido() {
           </View>
         )}
 
+        {/* Dados e ações do livro */}
         <View style={styles.info}>
           <Text style={[styles.titulo, { color: colors.text }]}>
             {item.titulo}
@@ -80,8 +93,11 @@ export default function Lido() {
           <Text style={[styles.autor, { color: colors.secondaryText }]}>
             {item.autor}
           </Text>
+          
+          {/* Badge indicativo de leitura concluída */}
           <Text style={styles.concluido}>✅ Concluído</Text>
 
+          {/* Botão de remoção permanente */}
           <TouchableOpacity
             style={styles.botaoExcluir}
             onPress={() => confirmarExclusao(item.id, item.titulo)}
@@ -96,11 +112,14 @@ export default function Lido() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={[styles.tituloPagina, { color: colors.text }]}>📚 Lido</Text>
+      
+      {/* Exibe mensagem informativa se a lista estiver vazia */}
       {livros.length === 0 ? (
         <Text style={[styles.vazio, { color: colors.mutedText }]}>
           Você ainda não concluiu nenhum livro.
         </Text>
       ) : (
+        /* Renderiza a lista de livros de forma otimizada */
         <FlatList
           data={livros}
           keyExtractor={(item) => String(item.id)}
@@ -112,6 +131,7 @@ export default function Lido() {
   );
 }
 
+// Estilização dos componentes da tela
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -127,7 +147,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   card: {
-    flexDirection: "row",
+    flexDirection: "row", // Organiza imagem na esquerda e texto/botão na direita
     marginBottom: 16,
     padding: 12,
     borderRadius: 12,
